@@ -34,7 +34,7 @@ TIERS: dict[str, tuple[str, str, str]] = {
     "Llama-3.2-3B-Instruct": (
         "bartowski/Llama-3.2-3B-Instruct-GGUF",
         "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
-        "Llama-3.2-3B-Instruct-Q2_K.gguf",
+        "Llama-3.2-3B-Instruct-IQ2_M.gguf",
     ),
     "Qwen2.5-7B-Instruct": (
         "Qwen/Qwen2.5-7B-Instruct-GGUF",
@@ -97,7 +97,17 @@ def main() -> int:
         print(f"    -> {primary}")
 
         print(f"==> Downloading {tier_key} ({q2_file}) — for quantization comparison")
-        compare = Path(hf_hub_download(repo_id=repo_id, filename=q2_file, local_dir=str(out_dir)))
+        try:
+            compare = Path(
+                hf_hub_download(
+                    repo_id=repo_id,
+                    filename=q2_file,
+                    local_dir=str(out_dir),
+                )
+            )
+        except Exception as e:
+            print(f"WARNING: could not download comparison quantization {q2_file}: {e}")
+            compare = primary
         print(f"    -> {compare}")
 
     config = {
